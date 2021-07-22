@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
@@ -8,8 +10,13 @@ namespace dyn_nft_loader
     class Program
     {
 
+        static HttpWebRequest webRequest;
+
+
         static void Main(string[] args)
         {
+
+            Global.LoadSettings();
 
             /*
             1 - create asset class metadata and generate hash
@@ -71,7 +78,7 @@ namespace dyn_nft_loader
 
             string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"dy1q6y6uv9thwl99up2l4pj9q3l4lfuwml6wn5863q\" , 0], \"nft_command\" : \"\"  }";
 
-
+            string txID = rpcExec(rpcAddAssetClass);
 
         }
 
@@ -85,5 +92,42 @@ namespace dyn_nft_loader
             }
             return sb.ToString();
         }
+
+
+        public static string rpcExec(string command)
+        {
+            webRequest = (HttpWebRequest)WebRequest.Create(Global.FullNodeRPC());
+            webRequest.KeepAlive = false;
+
+            var data = Encoding.ASCII.GetBytes(command);
+
+            webRequest.Method = "POST";
+            webRequest.ContentType = "application/x-www-form-urlencoded";
+            webRequest.ContentLength = data.Length;
+
+            var username = Global.FullNodeUser();
+            var password = Global.FullNodePass();
+            string encoded = System.Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(username + ":" + password));
+            webRequest.Headers.Add("Authorization", "Basic " + encoded);
+
+
+            using (var stream = webRequest.GetRequestStream())
+            {
+                stream.Write(data, 0, data.Length);
+            }
+
+
+            var webresponse = (HttpWebResponse)webRequest.GetResponse();
+
+            string submitResponse = new StreamReader(webresponse.GetResponseStream()).ReadToEnd();
+
+            webresponse.Dispose();
+
+
+            return submitResponse;
+        }
+
+
+
     }
 }
