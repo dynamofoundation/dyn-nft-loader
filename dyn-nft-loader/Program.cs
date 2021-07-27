@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace dyn_nft_loader
 {
@@ -47,7 +48,8 @@ namespace dyn_nft_loader
             */
 
             string assetClassMetaData = "The only way whereby anyone divests himself of his natural liberty, and puts on the bonds of civil society, is by agreeing with other men to join and unite into a community, for their comfortable, safe, and peaceable living one amongst another, in a secure enjoyment of their properties, and a greater security against any that are not of it.";
-            //string ownerAddress = "dy1qzvx3yfrucqa2ntsw8e7dyzv6u6dl2c2wjvx5jy";
+            string ownerAddress = "dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4";
+
             int metaDataLen = assetClassMetaData.Length;
 
             SHA256 hasher = SHA256.Create();
@@ -72,14 +74,67 @@ namespace dyn_nft_loader
             nftRawData[metaDataLen +  2+6] = (byte)((maxSerial & 0x000000000000FF00) >> 8);
             nftRawData[metaDataLen +  2+7] = (byte)((maxSerial & 0x00000000000000FF));
 
+            string hexNFTRawData = ByteToHex(nftRawData);
+
             byte[] hash = hasher.ComputeHash(nftRawData);
 
             string strHash = ByteToHex(hash);
+            string nftCommand = "00" + strHash;     //add asset class opcode
 
-            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"dy1q6y6uv9thwl99up2l4pj9q3l4lfuwml6wn5863q\" , 0], \"nft_command\" : \"\"  }";
+            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress +"\" , 0.001, \"\", \"\", true ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
-            string txID = rpcExec(rpcAddAssetClass);
+            string rpcResult = rpcExec(rpcAddAssetClass);
+            dynamic jRPCResult = JObject.Parse(rpcResult);
+            string txID = jRPCResult.result;
 
+            byte[] byteOwnerAddr = System.Text.Encoding.UTF8.GetBytes(ownerAddress);
+            byte[] byteTXID = HexToByte(txID);
+
+            hasher.Initialize();
+            byte[] bHash1Buffer = new byte[hash.Length + byteOwnerAddr.Length];
+            System.Buffer.BlockCopy(hash, 0, bHash1Buffer, 0, hash.Length);
+            System.Buffer.BlockCopy(byteOwnerAddr, 0, bHash1Buffer, hash.Length, byteOwnerAddr.Length);
+            byte[] hash1 = hasher.ComputeHash(bHash1Buffer);
+
+            hasher.Initialize();
+            byte[] bHash2Buffer = new byte[hash1.Length + byteTXID.Length];
+            System.Buffer.BlockCopy(hash1, 0, bHash2Buffer, 0, hash1.Length);
+            System.Buffer.BlockCopy(byteTXID, 0, bHash2Buffer, hash1.Length, byteTXID.Length);
+            byte[] hash2 = hasher.ComputeHash(bHash2Buffer);
+
+            string nftHash = ByteToHex(hash2);
+
+
+            string command = "add-class";
+
+            rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"submitnft\", \"params\" : [ \"" + command + "\", \"" + hexNFTRawData + "\", \"" + ownerAddress +"\", \"" + txID + "\", \"\" ] }";
+
+            string nftHashVerify = rpcExec(rpcAddAssetClass);
+
+        }
+
+
+        public static byte[] HexToByte(string data)
+        {
+            data = data.ToUpper();
+            byte[] result = new byte[data.Length / 2];
+            for ( int i = 0; i < data.Length; i += 2)
+            {
+                byte hi = hex(data[i]);
+                byte lo = hex(data[i + 1]);
+                result[i / 2] = (byte)(hi * 16 + lo);
+            }
+
+            return result;
+        }
+
+        public static byte hex(char data)
+        {
+
+            if (data < 'A')
+                return (byte)(data - '0');
+            else
+                return (byte)((data - 'A' ) + 10);
         }
 
 
