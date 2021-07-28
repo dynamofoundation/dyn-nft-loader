@@ -20,12 +20,8 @@ namespace dyn_nft_loader
             Global.LoadSettings();
 
             string assetClassID = CreateNFTAssetClass("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", "Diamond sparkelle dog", 10);
-            string assetID1 = CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #1", 1, "diamond_dog1.png");
-            string assetID2 = CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #2", 2, "diamond_dog2.png");
-            string assetID3 = CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #3", 3, "diamond_dog3.png");
-
-
-
+            string assetID1 = CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #1", 1, "image1.png");
+            string assetID2 = CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #2", 2, "image2.png");
 
         }
 
@@ -94,7 +90,7 @@ namespace dyn_nft_loader
             string strHash = ByteToHex(hash);
             string nftCommand = "00" + strHash;     //add asset class opcode
 
-            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.001, \"\", \"\", true ], \"nft_command\" : \"" + nftCommand + "\"  }";
+            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.01, \"\", \"\", true ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
             string rpcResult = rpcExec(rpcAddAssetClass);
             dynamic jRPCResult = JObject.Parse(rpcResult);
@@ -148,8 +144,8 @@ namespace dyn_nft_loader
             long nftHashLen = metaDataLen + 2 + 8 + binaryData.Length + 3;     
             byte[] nftRawData = new byte[nftHashLen];
 
-            nftRawData[0] = (byte)(nftHashLen >> 8);
-            nftRawData[1] = (byte)(nftHashLen & 0xFF);
+            nftRawData[0] = (byte)(metaDataLen >> 8);
+            nftRawData[1] = (byte)(metaDataLen & 0xFF);
 
             byte[] metaDataBytes = System.Text.Encoding.UTF8.GetBytes(assetClassMetaData);
             for (int i = 0; i < metaDataLen; i++)
@@ -157,12 +153,12 @@ namespace dyn_nft_loader
 
             nftRawData[metaDataLen + 2] = (byte)(binaryData.Length >> 16);
             nftRawData[metaDataLen + 2 + 1] = (byte)((binaryData.Length & 0x00FF00) >> 8);
-            nftRawData[metaDataLen + 2 + 3] = (byte)((binaryData.Length & 0x0000FF));
+            nftRawData[metaDataLen + 2 + 2] = (byte)((binaryData.Length & 0x0000FF));
 
             for (int i = 0; i < binaryData.Length; i++)
-                nftRawData[metaDataLen + 2 + 4 + i] = binaryData[i];
+                nftRawData[metaDataLen + 2 + 3 + i] = binaryData[i];
 
-            int offset = metaDataLen + 2 + 4 + binaryData.Length;
+            int offset = metaDataLen + 2 + 3 + binaryData.Length;
             nftRawData[offset] = (byte)(serial >> 56);
             nftRawData[offset + 1] = (byte)((serial & 0x00FF000000000000) >> 48);
             nftRawData[offset + 2] = (byte)((serial & 0x0000FF0000000000) >> 40);
@@ -184,7 +180,7 @@ namespace dyn_nft_loader
             string strHash = ByteToHex(hash);
             string nftCommand = "01" + strHash;     //add asset class opcode
 
-            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.001, \"\", \"\", true ], \"nft_command\" : \"" + nftCommand + "\"  }";
+            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 1, \"\", \"\", true ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
             string rpcResult = rpcExec(rpcAddAssetClass);
             dynamic jRPCResult = JObject.Parse(rpcResult);
@@ -261,6 +257,7 @@ namespace dyn_nft_loader
         {
             webRequest = (HttpWebRequest)WebRequest.Create(Global.FullNodeRPC());
             webRequest.KeepAlive = false;
+            webRequest.Timeout = 300000;
 
             var data = Encoding.ASCII.GetBytes(command);
 
