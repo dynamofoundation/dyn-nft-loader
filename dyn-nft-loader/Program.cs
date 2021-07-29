@@ -20,7 +20,7 @@ namespace dyn_nft_loader
             Global.LoadSettings();
 
             string assetClassID = CreateNFTAssetClass("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", "Diamond sparkelle dog", 1000);
-            for ( int i = 0; i < 100; i++)
+            for ( ulong i = 0; i < 100; i++)
                 CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #" + i, i, "image1.png");
 
         }
@@ -90,7 +90,7 @@ namespace dyn_nft_loader
             string strHash = ByteToHex(hash);
             string nftCommand = "00" + strHash;     //add asset class opcode
 
-            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.01, \"\", \"\", true ], \"nft_command\" : \"" + nftCommand + "\"  }";
+            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
             string rpcResult = rpcExec(rpcAddAssetClass);
             dynamic jRPCResult = JObject.Parse(rpcResult);
@@ -182,7 +182,7 @@ namespace dyn_nft_loader
             string strHash = ByteToHex(hash);
             string nftCommand = "01" + strHash;     //add asset class opcode
 
-            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 1, \"\", \"\", true ], \"nft_command\" : \"" + nftCommand + "\"  }";
+            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
             string rpcResult = rpcExec(rpcAddAssetClass);
             dynamic jRPCResult = JObject.Parse(rpcResult);
