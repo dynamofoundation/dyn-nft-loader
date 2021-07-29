@@ -19,9 +19,9 @@ namespace dyn_nft_loader
 
             Global.LoadSettings();
 
-            string assetClassID = CreateNFTAssetClass("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", "Diamond sparkelle dog", 10);
-            string assetID1 = CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #1", 1, "image1.png");
-            string assetID2 = CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #2", 2, "image2.png");
+            string assetClassID = CreateNFTAssetClass("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", "Diamond sparkelle dog", 1000);
+            for ( int i = 0; i < 100; i++)
+                CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #" + i, i, "image1.png");
 
         }
 
@@ -118,7 +118,9 @@ namespace dyn_nft_loader
 
             rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"submitnft\", \"params\" : [ \"" + command + "\", \"" + hexNFTRawData + "\", \"" + ownerAddress + "\", \"" + txID + "\", \"\" ] }";
 
-            string nftHashVerify = rpcExec(rpcAddAssetClass);
+            rpcResult = rpcExec(rpcAddAssetClass);
+            jRPCResult = JObject.Parse(rpcResult);
+            string nftHashVerify = jRPCResult.result;
 
             if (nftHash != nftHashVerify)
             {
@@ -207,7 +209,9 @@ namespace dyn_nft_loader
 
             rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"submitnft\", \"params\" : [ \"" + command + "\", \"" + hexNFTRawData + "\", \"" + ownerAddress + "\", \"" + txID + "\", \"" + assetClassID + "\" ] }";
 
-            string nftHashVerify = rpcExec(rpcAddAssetClass);
+            rpcResult = rpcExec(rpcAddAssetClass);
+            jRPCResult = JObject.Parse(rpcResult);
+            string nftHashVerify = jRPCResult.result;
 
             if (nftHash != nftHashVerify)
             {
