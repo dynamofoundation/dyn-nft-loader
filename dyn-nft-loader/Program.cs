@@ -19,6 +19,47 @@ namespace dyn_nft_loader
 
             Global.LoadSettings();
 
+            /*
+            string command = "get-class";
+            string hash = "0293299a5fcb2e561527a213b07901c23889bb8728c764f4b8481ed0ea1c59ef";
+            string getcommand = "{ \"id\": 0, \"method\" : \"getnft\", \"params\" : [ \"" + command + "\", \"" + hash + "\" ] }";
+
+            string rpcResult = rpcExec(getcommand);
+            */
+
+
+            /*
+            string ownerAddress = "dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4";
+            string assetClassHash = "8a9c31565b91d966d9cf94d9bbaedba14a38a2a7aa8e6017030915f65d1783f1";
+            string newOwner = "dy1qhtg9zqf2fdnewguyap3rtrnewguykvmenewgu";
+            byte[] bNewOwner = System.Text.Encoding.UTF8.GetBytes(newOwner);
+
+            //02 for send NFT
+            //00 for asset class
+            string nftCommand = "02" + "00" + assetClassHash + ByteToHex(bNewOwner);
+
+            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
+
+            string rpcResult = rpcExec(rpcAddAssetClass);
+            */
+
+            
+
+            string ownerAddress = "dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4";
+            string assetHash = "fcc8ba1cdfcb023e3efd389a92c3d5447402408e4a33d48c07bcf3cdd0d68c14";
+            string newOwner = "dy1qhtg9zqf2fdnewguyap3rtrnewguykvmenewgu";
+            byte[] bNewOwner = System.Text.Encoding.UTF8.GetBytes(newOwner);
+
+            //02 for send NFT
+            //00 for asset class
+            string nftCommand = "02" + "01" + assetHash + ByteToHex(bNewOwner);
+
+            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
+
+            string rpcResult = rpcExec(rpcAddAssetClass);
+
+
+
             string assetClassID = CreateNFTAssetClass("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", "Diamond sparkelle dog", 1000);
             for ( ulong i = 0; i < 100; i++)
                 CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #" + i, i, "image1.png");
