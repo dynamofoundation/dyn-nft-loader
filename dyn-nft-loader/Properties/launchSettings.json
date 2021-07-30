@@ -2,7 +2,7 @@
   "profiles": {
     "dyn-nft-loader": {
       "commandName": "Project",
-      "commandLineArgs": "create_asset_class dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 \"It was the best of times, it was the best of times.  Dont' worry be happy\" 100"
+      "commandLineArgs": "create_asset_class dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 \"This is a test asset class\" 100"
     }
   }
 }

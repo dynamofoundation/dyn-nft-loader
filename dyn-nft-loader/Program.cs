@@ -25,21 +25,24 @@ namespace dyn_nft_loader
                 System.Environment.Exit(1);
             }
 
-            string command = args[1].ToLower();
+            string command = args[0].ToLower();
             string result = "error";
 
 
-            if (args[1] == "create_asset_class")
-                result = CreateNFTAssetClass(args[2], args[3], Convert.ToUInt64(args[4]));
-            else if (args[1] == "create_asset")
-                result = CreateNFTAsset(args[3], args[2], args[4], Convert.ToUInt64(args[5]), args[6]);
-            else if (args[1] == "send_asset_class")
-                result = SendAssetClass(args[3], args[4], args[5]);
-            else if (args[1] == "send_asset")
-                result = SendAsset(args[3], args[4], args[5]);
-            else if (args[1] == "get")
-                result = GetAsset(args[2]);
+            if (command == "create_asset_class")
+                result = CreateNFTAssetClass(args[1], args[2], Convert.ToUInt64(args[3]));
+            else if (command == "create_asset")
+                result = CreateNFTAsset(args[2], args[1], args[3], Convert.ToUInt64(args[4]), args[5]);
+            else if (command == "send_asset_class")
+                result = SendAssetClass(args[1], args[2], args[3]);
+            else if (command == "send_asset")
+                result = SendAsset(args[1], args[2], args[3]);
+            else if (command == "get_asset_class")
+                result = GetAssetClass(args[1]);
+            else if (command == "get_asset")
+                result = GetAsset(args[1]);
 
+            Console.WriteLine(result);
         }
 
 
@@ -93,12 +96,34 @@ namespace dyn_nft_loader
         }
 
 
-        //get an NFT asset class or asset
-        public static string GetAsset(string hash)
+        //get an NFT asset class
+        public static string GetAssetClass(string hash)
         {
             string result = "error";
 
             string command = "get-class";
+            string getcommand = "{ \"id\": 0, \"method\" : \"getnft\", \"params\" : [ \"" + command + "\", \"" + hash + "\" ] }";
+
+            try
+            {
+                string rpcResult = rpcExec(getcommand);
+                dynamic jRPCResult = JObject.Parse(rpcResult);
+                result = jRPCResult.result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+
+            return result;
+        }
+
+        public static string GetAsset(string hash)
+        {
+            string result = "error";
+
+            string command = "get-asset";
             string getcommand = "{ \"id\": 0, \"method\" : \"getnft\", \"params\" : [ \"" + command + "\", \"" + hash + "\" ] }";
 
             try
