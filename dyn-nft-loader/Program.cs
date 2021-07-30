@@ -17,86 +17,109 @@ namespace dyn_nft_loader
         static void Main(string[] args)
         {
 
-            Global.LoadSettings();
+            if (File.Exists("settings.txt"))
+                Global.LoadSettings();
+            else
+            {
+                Console.WriteLine("Missing settings.txt file.");
+                System.Environment.Exit(1);
+            }
 
-            /*
-            string command = "get-class";
-            string hash = "0293299a5fcb2e561527a213b07901c23889bb8728c764f4b8481ed0ea1c59ef";
-            string getcommand = "{ \"id\": 0, \"method\" : \"getnft\", \"params\" : [ \"" + command + "\", \"" + hash + "\" ] }";
-
-            string rpcResult = rpcExec(getcommand);
-            */
+            string command = args[1].ToLower();
+            string result = "error";
 
 
-            /*
-            string ownerAddress = "dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4";
-            string assetClassHash = "8a9c31565b91d966d9cf94d9bbaedba14a38a2a7aa8e6017030915f65d1783f1";
-            string newOwner = "dy1qhtg9zqf2fdnewguyap3rtrnewguykvmenewgu";
+            if (args[1] == "create_asset_class")
+                result = CreateNFTAssetClass(args[2], args[3], Convert.ToUInt64(args[4]));
+            else if (args[1] == "create_asset")
+                result = CreateNFTAsset(args[3], args[2], args[4], Convert.ToUInt64(args[5]), args[6]);
+            else if (args[1] == "send_asset_class")
+                result = SendAssetClass(args[3], args[4], args[5]);
+            else if (args[1] == "send_asset")
+                result = SendAsset(args[3], args[4], args[5]);
+            else if (args[1] == "get")
+                result = GetAsset(args[2]);
+
+        }
+
+
+        public static string SendAssetClass(string assetHash, string oldOwner, string newOwner)
+        {
+            string result = "error";
             byte[] bNewOwner = System.Text.Encoding.UTF8.GetBytes(newOwner);
 
-            //02 for send NFT
-            //00 for asset class
-            string nftCommand = "02" + "00" + assetClassHash + ByteToHex(bNewOwner);
+            string nftCommand = "02" + "00" + assetHash + ByteToHex(bNewOwner);
 
-            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
+            string sendcommand = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + oldOwner + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
-            string rpcResult = rpcExec(rpcAddAssetClass);
-            */
+            try
+            {
+                string rpcResult = rpcExec(sendcommand);
+                dynamic jRPCResult = JObject.Parse(rpcResult);
+                result = jRPCResult.result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
 
-            
+            return result;
+        }
 
-            string ownerAddress = "dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4";
-            string assetHash = "fcc8ba1cdfcb023e3efd389a92c3d5447402408e4a33d48c07bcf3cdd0d68c14";
-            string newOwner = "dy1qhtg9zqf2fdnewguyap3rtrnewguykvmenewgu";
+
+        public static string SendAsset(string assetHash, string oldOwner, string newOwner)
+        {
+            string result = "error";
             byte[] bNewOwner = System.Text.Encoding.UTF8.GetBytes(newOwner);
 
-            //02 for send NFT
-            //00 for asset class
             string nftCommand = "02" + "01" + assetHash + ByteToHex(bNewOwner);
 
-            string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
+            string sendcommand = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + oldOwner + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
-            string rpcResult = rpcExec(rpcAddAssetClass);
+            try
+            {
+                string rpcResult = rpcExec(sendcommand);
+                dynamic jRPCResult = JObject.Parse(rpcResult);
+                result = jRPCResult.result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+
+            return result;
+        }
 
 
+        //get an NFT asset class or asset
+        public static string GetAsset(string hash)
+        {
+            string result = "error";
 
-            string assetClassID = CreateNFTAssetClass("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", "Diamond sparkelle dog", 1000);
-            for ( ulong i = 0; i < 100; i++)
-                CreateNFTAsset("dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4", assetClassID, "Diamond sparkelle dog #" + i, i, "image1.png");
+            string command = "get-class";
+            string getcommand = "{ \"id\": 0, \"method\" : \"getnft\", \"params\" : [ \"" + command + "\", \"" + hash + "\" ] }";
 
+            try
+            {
+                string rpcResult = rpcExec(getcommand);
+                dynamic jRPCResult = JObject.Parse(rpcResult);
+                result = jRPCResult.result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+
+            return result;
         }
 
 
         public static string CreateNFTAssetClass(string owner, string metaData, UInt64 maxSerial)
         {
 
-            /*
-            1 - create asset class metadata and generate hash
-            2 - submit hash for mining into blockchain, get txid
-            3 - submit nft data command to local fullnode
-             */
-
-
-            /*
-            NFT data format:
-                first byte is command
-                00 - add asset class
-                01 - add asset
-
-                two bytes metadata length
-
-                metadata  <variable>
-
-                max count <8 bytes>
-
-                (for asset only)
-                three bytes data length
-
-                binary data  <variable>
-
-                serial number <8 bytes>
-
-            */
 
             string assetClassMetaData = metaData;
             string ownerAddress = owner;
@@ -165,10 +188,11 @@ namespace dyn_nft_loader
 
             if (nftHash != nftHashVerify)
             {
-                Console.WriteLine("something went wrong");                
+                Console.WriteLine("hash mismatch");
+                return "error";
             }
-
-            return nftHash;
+            else
+                return nftHash;
         }
 
 
@@ -256,10 +280,11 @@ namespace dyn_nft_loader
 
             if (nftHash != nftHashVerify)
             {
-                Console.WriteLine("something went wrong");
+                Console.WriteLine("hash mismatch");
+                return "error";
             }
-
-            return nftHash;
+            else
+                return nftHash;
         }
 
 
