@@ -2,7 +2,7 @@
   "profiles": {
     "dyn-nft-loader": {
       "commandName": "Project",
-      "commandLineArgs": "create_asset_class dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 \"This is a test asset class\" 100"
+      "commandLineArgs": "create_web \"C:\\Users\\user\\source\\repos\\dyn-nft-loader\\dyn-nft-loader\\bin\\Debug\\netcoreapp3.1\\dynamocoin.org\" dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 \"dynamocoin.org.html\""
     }
   }
 }

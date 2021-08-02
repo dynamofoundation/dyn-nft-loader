@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -41,10 +43,119 @@ namespace dyn_nft_loader
                 result = GetAssetClass(args[1]);
             else if (command == "get_asset")
                 result = GetAsset(args[1]);
+            else if (command == "create_web")
+                result = CreateWeb(args[1], args[2], args[3]);
 
             Console.WriteLine(result);
         }
 
+
+        public static string CreateWeb (string directory, string owner, string indexFile )
+        {
+
+            List<string> fileNames = DirSearch(directory, directory);
+
+            List<byte> webPack = new List<byte>();
+
+            foreach (string fileName in fileNames)
+            {
+                byte[] data = File.ReadAllBytes(directory + "\\" + fileName);
+
+                AddString(webPack, fileName);
+                AddInt(webPack, fileName.Length);
+                AddBinary(webPack, data);
+            }
+
+            byte[] bWebPack = webPack.ToArray();
+
+            byte[] bCompressedPack = Compress(bWebPack);
+
+
+            string result = "error";
+
+            string assetClassMetaData = "webpack";
+            string assetMetaData = "{ \"webpack_version\" : 1,  \"index_file\" : \"dynamocoin.org.html\" }";
+
+
+            string assetClassHash = CreateNFTAssetClass(owner, assetClassMetaData, 1);
+            if (assetClassHash != "error")
+            {                
+                string zipFile = Path.GetTempFileName();
+                File.WriteAllBytes(zipFile, bCompressedPack);
+                string assetClass = CreateNFTAsset(owner, assetClassHash, assetMetaData, 0, zipFile);
+                File.Delete(zipFile);
+                result = assetClass;
+            }
+
+            return result;
+        }
+
+        public static void AddString(List<byte> blob, string data)
+        {
+            AddInt(blob, data.Length);
+            AddBinary(blob, Encoding.UTF8.GetBytes(data));
+        }
+
+        public static void AddInt(List<byte> blob, int data)
+        {
+            blob.Add((byte)(data >> 24));
+            blob.Add((byte)((data & 0x00FF0000) >> 16));
+            blob.Add((byte)((data & 0x0000FF00) >> 8));
+            blob.Add((byte)(data & 0x000000FF));
+        }
+
+        public static void AddBinary(List<byte> blob, byte[] data)
+        {
+            for (int i = 0; i < data.Length; i++)
+                blob.Add(data[i]);
+        }
+
+
+        public static List<String> DirSearch(string sDir, string rootDir)
+        {
+            List<String> files = new List<String>();
+            try
+            {
+                foreach (string f in Directory.GetFiles(sDir))
+                {
+                    string relative = Path.GetRelativePath(rootDir, f);
+                    files.Add(relative);
+                }
+                foreach (string d in Directory.GetDirectories(sDir))
+                {
+                    files.AddRange(DirSearch(d, rootDir));
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return files;
+        }
+
+
+        static byte[] Compress(byte[] data)
+        {
+            using (var compressedStream = new MemoryStream())
+            using (var zipStream = new GZipStream(compressedStream, CompressionLevel.Optimal))
+            {
+                zipStream.Write(data, 0, data.Length);
+                zipStream.Close();
+                return compressedStream.ToArray();
+            }
+        }
+
+        static byte[] Decompress(byte[] data)
+        {
+            using (var compressedStream = new MemoryStream(data))
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+            using (var resultStream = new MemoryStream())
+            {
+                zipStream.CopyTo(resultStream);
+                return resultStream.ToArray();
+            }
+        }
 
         public static string SendAssetClass(string assetHash, string oldOwner, string newOwner)
         {
