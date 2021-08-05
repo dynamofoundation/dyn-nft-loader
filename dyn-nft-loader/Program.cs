@@ -62,7 +62,6 @@ namespace dyn_nft_loader
                 byte[] data = File.ReadAllBytes(directory + "\\" + fileName);
 
                 AddString(webPack, fileName);
-                AddInt(webPack, fileName.Length);
                 AddBinary(webPack, data);
             }
 
@@ -92,7 +91,6 @@ namespace dyn_nft_loader
 
         public static void AddString(List<byte> blob, string data)
         {
-            AddInt(blob, data.Length);
             AddBinary(blob, Encoding.UTF8.GetBytes(data));
         }
 
@@ -106,6 +104,7 @@ namespace dyn_nft_loader
 
         public static void AddBinary(List<byte> blob, byte[] data)
         {
+            AddInt(blob, data.Length);
             for (int i = 0; i < data.Length; i++)
                 blob.Add(data[i]);
         }
