@@ -73,7 +73,7 @@ namespace dyn_nft_loader
             string result = "error";
 
             string assetClassMetaData = "webpack";
-            string assetMetaData = "{ \"webpack_version\" : 1,  \"index_file\" : \"dynamocoin.org.html\" }";
+            string assetMetaData = "{ \"webpack_version\" : 1,  \"index_file\" : \"" + indexFile + "\" }";
 
 
             string assetClassHash = CreateNFTAssetClass(owner, assetClassMetaData, 1);

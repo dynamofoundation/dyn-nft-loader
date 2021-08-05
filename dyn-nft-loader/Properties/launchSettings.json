@@ -2,7 +2,8 @@
   "profiles": {
     "dyn-nft-loader": {
       "commandName": "Project",
-      "commandLineArgs": "create_web \"C:\\Users\\user\\source\\repos\\dyn-nft-loader\\dyn-nft-loader\\bin\\Debug\\netcoreapp3.1\\dynamocoin.org\" dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 \"dynamocoin.org.html\""
+      "commandLineArgs": "create_web \"C:\\Users\\user\\source\\repos\\dyn-web-wallet\\dyn-web-wallet\" dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 \"main.html\"",
+      "sqlDebugging": true
     }
   }
 }
