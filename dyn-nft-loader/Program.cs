@@ -8,6 +8,14 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+
+/*
+create_web "C:\Users\user\source\repos\dyn-web-wallet\dyn-web-wallet" dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 "main.html"
+
+list_asset_class dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 0
+
+*/
+
 namespace dyn_nft_loader
 {
     class Program
@@ -45,6 +53,10 @@ namespace dyn_nft_loader
                 result = GetAsset(args[1]);
             else if (command == "create_web")
                 result = CreateWeb(args[1], args[2], args[3]);
+            else if (command == "list_asset_class")
+                result = ListAssetClass(args[1], args[2]);
+            else if (command == "list_asset")
+                result = ListAsset(args[1], args[2]);
 
             Console.WriteLine(result);
         }
@@ -228,6 +240,53 @@ namespace dyn_nft_loader
 
             return result;
         }
+
+
+        public static string ListAssetClass(string owner, string strOffset)
+        {
+            string result = "error";
+
+            string command = "list-class";
+            string getcommand = "{ \"id\": 0, \"method\" : \"listnft\", \"params\" : [ \"" + command + "\", \"" + owner + "\", " + strOffset + " ] }";
+
+            try
+            {
+                string rpcResult = rpcExec(getcommand);
+                dynamic jRPCResult = JObject.Parse(rpcResult);
+                result = jRPCResult.result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+
+            return result;
+        }
+
+        public static string ListAsset(string owner, string strOffset)
+        {
+            string result = "error";
+
+            string command = "list-asset";
+            string getcommand = "{ \"id\": 0, \"method\" : \"listnft\", \"params\" : [ \"" + command + "\", \"" + owner + "\", " + strOffset + " ] }";
+
+            try
+            {
+                string rpcResult = rpcExec(getcommand);
+                dynamic jRPCResult = JObject.Parse(rpcResult);
+                result = jRPCResult.result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+
+            return result;
+        }
+
+
 
         public static string GetAsset(string hash)
         {

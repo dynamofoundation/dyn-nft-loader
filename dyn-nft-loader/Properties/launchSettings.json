@@ -2,7 +2,7 @@
   "profiles": {
     "dyn-nft-loader": {
       "commandName": "Project",
-      "commandLineArgs": "create_web \"C:\\Users\\user\\source\\repos\\dyn-web-wallet\\dyn-web-wallet\" dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 \"main.html\"",
+      "commandLineArgs": "list_asset dy1qhtg9zqf2fdh07vahzap3rtrg27va9kvmex7yz4 0",
       "sqlDebugging": true
     }
   }
