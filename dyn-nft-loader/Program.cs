@@ -325,8 +325,8 @@ namespace dyn_nft_loader
             long nftHashLen = metaDataLen + 2 + 8;     //2 bytes for length of metadata, 8 bytes for 64 bit serial
             byte[] nftRawData = new byte[nftHashLen];
 
-            nftRawData[0] = (byte)(nftHashLen >> 8);
-            nftRawData[1] = (byte)(nftHashLen & 0xFF);
+            nftRawData[0] = (byte)(metaDataLen >> 8);
+            nftRawData[1] = (byte)(metaDataLen & 0xFF);
 
             byte[] metaDataBytes = System.Text.Encoding.UTF8.GetBytes(assetClassMetaData);
             for (int i = 0; i < metaDataLen; i++)
