@@ -439,7 +439,7 @@ namespace dyn_nft_loader
             byte[] hash = hasher.ComputeHash(dataToHash);
 
             string strHash = ByteToHex(hash);
-            string nftCommand = "01" + strHash;     //add asset class opcode
+            string nftCommand = "01" + strHash;     //add asset opcode
 
             string rpcAddAssetClass = "{ \"id\": 0, \"method\" : \"sendtoaddress\", \"params\" : [ \"" + ownerAddress + "\" , 0.0001 ], \"nft_command\" : \"" + nftCommand + "\"  }";
 
